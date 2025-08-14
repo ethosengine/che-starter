@@ -1,0 +1,19 @@
+name: Template Setup
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  setup:
+    if: github.run_number == 1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Replace template variables
+        run: |
+          sed -i "s|{{GITHUB_REPO_URL}}|${{ github.server_url }}/${{ github.repository }}|g" README.md
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Initialize from template" || exit 0
+          git push
