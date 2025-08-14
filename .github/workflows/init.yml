@@ -5,7 +5,8 @@ on:
     
 jobs:
   setup:
-    if: github.run_number == 1
+    # Only run if this is NOT the template repo
+    if: github.run_number == 1 && github.repository != 'ethosengine/che-starter'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,16 +14,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Replace template variables
         run: |
-          # Use GitHub context variables for the actual new repo
           REPO_URL="${{ github.server_url }}/${{ github.repository }}"
-          echo "Replacing with: $REPO_URL"
-          
-          # Replace the placeholder in README.md
           sed -i "s|{{GITHUB_REPO_URL}}|$REPO_URL|g" README.md
-          
-          # Commit the changes
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add README.md
-          git commit -m "Initialize from template with correct repository URL" || exit 0
+          git commit -m "Initialize from template" || exit 0
           git push
